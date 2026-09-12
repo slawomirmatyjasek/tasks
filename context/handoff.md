@@ -1,7 +1,7 @@
 # Handoff — projekt "Pilne"
 
 > Dokument przekazania dla agenta, który wchodzi w ten projekt bez kontekstu
-> (nowa sesja, restart maszyny). Stan na **2026-09-12**.
+> (nowa sesja, restart maszyny). Stan na **2026-09-12**, po weryfikacji na żywo.
 > Po każdej istotnej zmianie zaktualizuj sekcje „Stan" i „Następne kroki".
 
 ## 1. Czym jest ten projekt
@@ -46,13 +46,33 @@ npx astro check     # 0 errors
 npm run build       # OK
 ```
 
-### Czego NIE udowodniono
+### Co zostało zweryfikowane na prawdziwej bazie (2026-09-12)
 
-To jest najważniejsza informacja w tym dokumencie. **Żaden fragment tego kodu
-nie działał jeszcze na prawdziwej bazie danych.** 150 testów chodzi na atrapach
-klienta Supabase. Migracja RLS istnieje wyłącznie jako plik. Dwa najwyższe ryzyka
-z `context/foundation/test-plan.md` — pustka po zalogowaniu i widoczność cudzych
-zadań — są dokładnie tymi, których atrapy nie wychwycą.
+Nie tylko atrapy — poniższe przeszło przez realny Supabase i realny serwer SSR:
+
+- **Izolacja danych (US-05), sześć sprawdzeń:** konto B nie odczyta, nie zedytuje
+  ani nie usunie zadania konta A (za każdym razem zero wierszy), a próba wstawienia
+  zadania z cudzym `user_id` kończy się `403` — to zasługa `with check` w politykach.
+- **Reguła pilności rozróżnia:** przeterminowane nieukończone → pilne; termin za 24h
+  → pilne; termin za 5 dni → nie; **termin za 2h ale ukończone → nie**. Ostatni
+  przypadek jest kluczowy, bo to na nim taka reguła zwykle się wykłada.
+- **Pełny przepływ przez aplikację:** logowanie → sesja w ciasteczku → `/dashboard`
+  renderuje listę po stronie serwera z poprawnymi flagami i sortowaniem (ukończone
+  na końcu, odwrócony przycisk toggle).
+- **Ochrona CSRF Astro działa** — POST na `/api/auth/signin` bez nagłówka `Origin`
+  dostaje `403`.
+
+### Czego nadal NIE udowodniono
+
+- **Przełączenie strefy czasowej po hydracji.** SSR renderuje termin w UTC (celowo,
+  patrz commit `2403800`); podmiana na strefę użytkownika po zamontowaniu wyspy
+  została udowodniona skryptem na `react-dom/server`, ale nie w prawdziwej
+  przeglądarce. Otwórz `/dashboard` ręcznie i sprawdź, czy godzina zgadza się
+  z wpisaną.
+- **Zachowanie na Cloudflare Workers** — nic nie było jeszcze wdrożone.
+- Konta testowe `rls-a-1789249572@proton.me` i `rls-b-1789249572@proton.me`
+  zostały w bazie (ich zadania usunięto). Do skasowania w panelu:
+  Authentication → Users.
 
 ## 3. Stan zewnętrznych usług
 
@@ -75,19 +95,11 @@ Katalog zlinkowany z projektem, `supabase db push` wykonany. Weryfikacja:
 `GET /rest/v1/tasks` bez sesji zwraca `42501 permission denied` zamiast `PGRST205`,
 czyli tabela istnieje, a `anon` słusznie nie ma do niej dostępu.
 
-### Krok 2 — weryfikacja end-to-end na prawdziwych danych
+### Krok 2 — ZROBIONE: weryfikacja end-to-end
 
-`npm run dev`, potem **załóż dwa różne konta** i sprawdź:
-
-1. **AKTUALNA BLOKADA:** projekt ma włączone potwierdzanie e-maila, a limit wysyłki
-   darmowego planu został już wyczerpany (`over_email_send_rate_limit`). Rejestracja
-   nie zwróci sesji, dopóki człowiek nie wyłączy tego w panelu:
-   Authentication → Sign In / Providers → Email → „Confirm email" = off,
-2. dodanie zadania z terminem za ~24h zapala flagę „Pilne",
-3. oznaczenie go jako ukończone flagę gasi,
-4. **konto A nie widzi zadań konta B** — to jedyny realny test RLS,
-5. termin wyświetlany na liście zgadza się z wpisanym (to był naprawiony bloker
-   ze strefą czasową — patrz commit `2403800`).
+Przeprowadzona 2026-09-12 przez API uwierzytelniania i serwer dev. Wyniki w sekcji
+„Co zostało zweryfikowane". Pozostaje jedno ręczne sprawdzenie w przeglądarce:
+czy po hydracji termin pokazuje się w strefie użytkownika, a nie w UTC.
 
 ### Krok 3 — ZROBIONE: push i zielone CI
 
@@ -160,13 +172,13 @@ wymyślone i warto je znać przed dotykaniem odpowiednich plików.
 
 ## 7. Wymogi certyfikacji — stan
 
-| #   | Wymóg            | Stan                                            |
-| --- | ---------------- | ----------------------------------------------- |
-| 1   | Kontrola dostępu | kod gotowy, **niezweryfikowany na bazie**       |
-| 2   | Sensowny CRUD    | kod gotowy, **niezweryfikowany na bazie**       |
-| 3   | Logika biznesowa | ✅ flaga pilności, pokryta i odporna na mutacje |
-| 4   | Artefakty M1–M3  | ✅                                              |
-| 5   | Min. 1 test      | ✅ 150                                          |
-| 6   | CI/CD            | ✅ pipeline uruchomiony i zielony na `main`     |
+| #   | Wymóg            | Stan                                               |
+| --- | ---------------- | -------------------------------------------------- |
+| 1   | Kontrola dostępu | ✅ RLS zweryfikowane na żywo, sześć sprawdzeń      |
+| 2   | Sensowny CRUD    | ✅ przetestowany przez aplikację, nie tylko atrapy |
+| 3   | Logika biznesowa | ✅ flaga pilności, pokryta i odporna na mutacje    |
+| 4   | Artefakty M1–M3  | ✅                                                 |
+| 5   | Min. 1 test      | ✅ 150                                             |
+| 6   | CI/CD            | ✅ pipeline uruchomiony i zielony na `main`        |
 
 Źródło wymogów: `C:\Users\slawomirmat\Desktop\td\prework\42-dobry-i-zly-projekt-kursowy.md`
