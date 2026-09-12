@@ -21,21 +21,21 @@ w szczególności zakaz utrwalania flagi pilności gdziekolwiek poza momentem od
 
 ## 2. Stan — co jest zrobione
 
-Wszystko poniżej jest **zacommitowane lokalnie** (11 commitów na gałęzi `main`).
+Wszystko poniżej jest **zacommitowane i wypchnięte** na gałąź `main`.
 
-| Obszar                                                                | Stan                                     | Dowód                                                 |
-| --------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------- |
-| PRD, tech-stack, health-check, decisions-log                          | gotowe                                   | `context/foundation/`                                 |
-| Roadmapa i plan testów                                                | gotowe                                   | `context/foundation/roadmap.md`, `test-plan.md`       |
-| Reguły dla agenta                                                     | gotowe                                   | `AGENTS.md`                                           |
-| Migracja `tasks` + RLS + GRANT                                        | **plik gotowy, NIEZASTOSOWANY na bazie** | `supabase/migrations/20260912141556_create_tasks.sql` |
-| Logika pilności                                                       | gotowa                                   | `src/lib/urgency.ts`                                  |
-| Warstwa danych (CRUD)                                                 | gotowa                                   | `src/lib/tasks.ts`                                    |
-| API `/api/tasks`                                                      | gotowe                                   | `src/pages/api/tasks/`                                |
-| Interfejs (lista, dodawanie, edycja, usuwanie, toggle, filtr pilnych) | gotowy                                   | `src/pages/dashboard.astro`, `src/components/tasks/`  |
-| Testy jednostkowe                                                     | 150, zielone                             | 4 pliki `*.test.ts`                                   |
-| CI (typecheck + lint + test + build)                                  | plik gotowy                              | `.github/workflows/ci.yml`                            |
-| Uruchomienie lokalne                                                  | zweryfikowane                            | `/` 200, `/dashboard` → 302 na `/auth/signin`         |
+| Obszar                                                                | Stan                     | Dowód                                                 |
+| --------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------- |
+| PRD, tech-stack, health-check, decisions-log                          | gotowe                   | `context/foundation/`                                 |
+| Roadmapa i plan testów                                                | gotowe                   | `context/foundation/roadmap.md`, `test-plan.md`       |
+| Reguły dla agenta                                                     | gotowe                   | `AGENTS.md`                                           |
+| Migracja `tasks` + RLS + GRANT                                        | **zastosowana na bazie** | `supabase/migrations/20260912141556_create_tasks.sql` |
+| Logika pilności                                                       | gotowa                   | `src/lib/urgency.ts`                                  |
+| Warstwa danych (CRUD)                                                 | gotowa                   | `src/lib/tasks.ts`                                    |
+| API `/api/tasks`                                                      | gotowe                   | `src/pages/api/tasks/`                                |
+| Interfejs (lista, dodawanie, edycja, usuwanie, toggle, filtr pilnych) | gotowy                   | `src/pages/dashboard.astro`, `src/components/tasks/`  |
+| Testy jednostkowe                                                     | 150, zielone             | 4 pliki `*.test.ts`                                   |
+| CI (typecheck + lint + test + build)                                  | plik gotowy              | `.github/workflows/ci.yml`                            |
+| Uruchomienie lokalne                                                  | zweryfikowane            | `/` 200, `/dashboard` → 302 na `/auth/signin`         |
 
 **Bramki jakości — wszystkie zielone:**
 
@@ -56,11 +56,11 @@ zadań — są dokładnie tymi, których atrapy nie wychwycą.
 
 ## 3. Stan zewnętrznych usług
 
-| Usługa     | Stan                                                                                                                                                                                                                             |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Supabase   | Projekt istnieje, ref **`mntmewcgdicumlcuwpjq`**. `.env` i `.dev.vars` utworzone lokalnie i ignorowane przez gita. **Migracja niezastosowana** — `GET /rest/v1/tasks` zwraca `PGRST205: Could not find the table 'public.tasks'` |
-| GitHub     | Repo `https://github.com/slawomirmatyjasek/tasks` istnieje, ale jest **puste**. Remote skonfigurowany, **nic nie wypchnięte**                                                                                                    |
-| Cloudflare | **Niezalogowany.** `wrangler whoami` → „You are not authenticated"                                                                                                                                                               |
+| Usługa     | Stan                                                                                                                                                                                                                                                                                                                                                                       |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Supabase   | Projekt istnieje, ref **`mntmewcgdicumlcuwpjq`**, katalog zlinkowany. `.env` i `.dev.vars` utworzone lokalnie i ignorowane przez gita. **Migracja ZASTOSOWANA** — `GET /rest/v1/tasks` jako `anon` zwraca `42501 permission denied`, i to jest zachowanie poprawne: uprawnienia ma wyłącznie rola `authenticated`. NIE wykonuj podpowiedzi Postgresa o `GRANT ... TO anon` |
+| GitHub     | Repo `https://github.com/slawomirmatyjasek/tasks`, gałąź `main` **wypchnięta**. **CI przeszło na zielono** (typecheck, lint, 150 testów, build)                                                                                                                                                                                                                            |
+| Cloudflare | **Niezalogowany.** `wrangler whoami` → „You are not authenticated"                                                                                                                                                                                                                                                                                                         |
 
 **Sekrety:** nie ma ich w repo i nie wolno ich tam wprowadzać. `SUPABASE_URL`
 i `SUPABASE_KEY` (klucz publishable) są w `.env` i `.dev.vars` na dysku. Jeśli
@@ -69,45 +69,32 @@ biorąc klucz **publishable/anon**, nigdy **secret/service_role**.
 
 ## 4. Następne kroki — w tej kolejności
 
-### Krok 1 — zastosuj migrację (BLOKUJE WSZYSTKO)
+### Krok 1 — ZROBIONE: migracja zastosowana
 
-Wymaga hasła do bazy, które ma człowiek. Nie da się tego zrobić nieinteraktywnie
-bez tego hasła — poproś użytkownika, żeby uruchomił:
-
-```
-cd C:\Users\slawomirmat\Desktop\Pilne
-npx supabase link --project-ref mntmewcgdicumlcuwpjq
-npx supabase db push
-```
-
-Weryfikacja po fakcie (bez hasła): zapytanie do PostgREST ma przestać zwracać
-`PGRST205`. Sprawdź też w panelu, że tabela ma włączone RLS i cztery polityki.
+Katalog zlinkowany z projektem, `supabase db push` wykonany. Weryfikacja:
+`GET /rest/v1/tasks` bez sesji zwraca `42501 permission denied` zamiast `PGRST205`,
+czyli tabela istnieje, a `anon` słusznie nie ma do niej dostępu.
 
 ### Krok 2 — weryfikacja end-to-end na prawdziwych danych
 
 `npm run dev`, potem **załóż dwa różne konta** i sprawdź:
 
-1. rejestracja i logowanie działają (Supabase może wymagać potwierdzenia e-maila —
-   w panelu: Authentication → Email → wyłącz „Confirm email" na czas testów),
+1. **AKTUALNA BLOKADA:** projekt ma włączone potwierdzanie e-maila, a limit wysyłki
+   darmowego planu został już wyczerpany (`over_email_send_rate_limit`). Rejestracja
+   nie zwróci sesji, dopóki człowiek nie wyłączy tego w panelu:
+   Authentication → Sign In / Providers → Email → „Confirm email" = off,
 2. dodanie zadania z terminem za ~24h zapala flagę „Pilne",
 3. oznaczenie go jako ukończone flagę gasi,
 4. **konto A nie widzi zadań konta B** — to jedyny realny test RLS,
 5. termin wyświetlany na liście zgadza się z wpisanym (to był naprawiony bloker
    ze strefą czasową — patrz commit `2403800`).
 
-### Krok 3 — push na GitHub
+### Krok 3 — ZROBIONE: push i zielone CI
 
-Poświadczenia gita w systemie należą do **innego konta** (`slawomirmat`), a repo
-do `slawomirmatyjasek` — push kończy się `403`. Rozwiązanie ustalone z użytkownikiem:
-Personal Access Token. Poproś, żeby uruchomił u siebie:
-
-```
-git push -u origin main
-```
-
-i w miejsce hasła wkleił token. Po pushu CI powinno zaświecić na zielono —
-`astro check`, lint i testy nie potrzebują żadnych sekretów, a build przechodzi
-bez nich, bo zmienne są zadeklarowane jako opcjonalne.
+Gałąź `main` wypchnięta, pipeline zaliczył typecheck, lint, 150 testów i build.
+Uwaga na przyszłość: poświadczenia gita w systemie należą do konta `slawomirmat`,
+a repo do `slawomirmatyjasek` — przy kolejnych pushach z tej maszyny może znów
+pojawić się `403` i potrzebny będzie Personal Access Token.
 
 ### Krok 4 — sekrety w GitHubie
 
@@ -173,13 +160,13 @@ wymyślone i warto je znać przed dotykaniem odpowiednich plików.
 
 ## 7. Wymogi certyfikacji — stan
 
-| #   | Wymóg            | Stan                                                         |
-| --- | ---------------- | ------------------------------------------------------------ |
-| 1   | Kontrola dostępu | kod gotowy, **niezweryfikowany na bazie**                    |
-| 2   | Sensowny CRUD    | kod gotowy, **niezweryfikowany na bazie**                    |
-| 3   | Logika biznesowa | ✅ flaga pilności, pokryta i odporna na mutacje              |
-| 4   | Artefakty M1–M3  | ✅                                                           |
-| 5   | Min. 1 test      | ✅ 150                                                       |
-| 6   | CI/CD            | pipeline gotowy, **nie uruchomił się ani razu** (repo puste) |
+| #   | Wymóg            | Stan                                            |
+| --- | ---------------- | ----------------------------------------------- |
+| 1   | Kontrola dostępu | kod gotowy, **niezweryfikowany na bazie**       |
+| 2   | Sensowny CRUD    | kod gotowy, **niezweryfikowany na bazie**       |
+| 3   | Logika biznesowa | ✅ flaga pilności, pokryta i odporna na mutacje |
+| 4   | Artefakty M1–M3  | ✅                                              |
+| 5   | Min. 1 test      | ✅ 150                                          |
+| 6   | CI/CD            | ✅ pipeline uruchomiony i zielony na `main`     |
 
 Źródło wymogów: `C:\Users\slawomirmat\Desktop\td\prework\42-dobry-i-zly-projekt-kursowy.md`
