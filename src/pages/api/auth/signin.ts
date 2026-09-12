@@ -16,5 +16,8 @@ export const POST: APIRoute = async (context) => {
     return context.redirect(`/auth/signin?error=${encodeURIComponent(error.message)}`);
   }
 
-  return context.redirect("/");
+  // Zalogowany użytkownik ma jeden cel: swoją listę zadań. Strona główna jest
+  // wizytówką dla niezalogowanych, więc lądowanie na niej po logowaniu byłoby
+  // dodatkowym klikiem donikąd.
+  return context.redirect("/dashboard");
 };

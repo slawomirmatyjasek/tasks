@@ -23,21 +23,21 @@ export default function SignUpForm({ serverError }: Props) {
     const next: typeof errors = {};
 
     if (!email.trim()) {
-      next.email = "Email is required";
+      next.email = "Podaj adres e-mail";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      next.email = "Enter a valid email address";
+      next.email = "To nie wygląda na poprawny adres e-mail";
     }
 
     if (!password) {
-      next.password = "Password is required";
+      next.password = "Podaj hasło";
     } else if (password.length < MIN_PASSWORD_LENGTH) {
       next.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters`;
     }
 
     if (!confirmPassword) {
-      next.confirmPassword = "Please confirm your password";
+      next.confirmPassword = "Powtórz hasło";
     } else if (password !== confirmPassword) {
-      next.confirmPassword = "Passwords do not match";
+      next.confirmPassword = "Hasła nie są takie same";
     }
 
     setErrors(next);
@@ -80,14 +80,14 @@ export default function SignUpForm({ serverError }: Props) {
 
       <FormField
         id="password"
-        label="Password"
+        label="Hasło"
         type={showPassword ? "text" : "password"}
         value={password}
         onChange={(v) => {
           setPassword(v);
           clearError("password");
         }}
-        placeholder="Min. 6 characters"
+        placeholder="Minimum 6 znaków"
         error={errors.password}
         hint={passwordHint}
         icon={<Lock className="size-4" />}
@@ -104,14 +104,14 @@ export default function SignUpForm({ serverError }: Props) {
       <FormField
         id="confirmPassword"
         name="confirmPassword"
-        label="Confirm password"
+        label="Powtórz hasło"
         type={showConfirmPassword ? "text" : "password"}
         value={confirmPassword}
         onChange={(v) => {
           setConfirmPassword(v);
           clearError("confirmPassword");
         }}
-        placeholder="Re-enter your password"
+        placeholder="To samo hasło jeszcze raz"
         error={errors.confirmPassword}
         icon={<Lock className="size-4" />}
         endContent={
@@ -126,8 +126,8 @@ export default function SignUpForm({ serverError }: Props) {
 
       <ServerError message={serverError} />
 
-      <SubmitButton pendingText="Creating account..." icon={<UserPlus className="size-4" />}>
-        Create account
+      <SubmitButton pendingText="Zakładanie konta…" icon={<UserPlus className="size-4" />}>
+        Załóż konto
       </SubmitButton>
     </form>
   );

@@ -147,7 +147,7 @@ Izolacja danych między kontami została zweryfikowana **ręcznie** na prawdziwe
 Aplikacja jest wieloużytkownikowa, z jedną rolą: właściciel swoich zadań. Brak ról administracyjnych i brak współdzielenia zadań w MVP.
 
 - **Uwierzytelnianie:** Supabase Auth, e-mail + hasło. Sesja trzymana w ciasteczku, odczytywana po stronie serwera.
-- **Ochrona tras:** `src/middleware.ts` przekierowuje niezalogowanych na `/auth/signin`. Trasy objęte ochroną wymienia tablica `PROTECTED_ROUTES`.
+- **Ochrona tras:** `src/middleware.ts` przekierowuje niezalogowanych na `/auth/signin` (trasy objęte ochroną wymienia tablica `PROTECTED_ROUTES`), a zalogowanych — z wizytówki i ekranów logowania prosto na `/dashboard` (`GUEST_ONLY_ROUTES`), żeby nikt nie oglądał formularza logowania z aktywną sesją.
 - **Izolacja danych na poziomie bazy:** tabela `tasks` ma włączone Row Level Security i cztery osobne polityki `auth.uid() = user_id` — dla `select`, `insert`, `update` i `delete`. Uprawnienia do tabeli ma wyłącznie rola `authenticated`; rola `anon` nie dosięga jej wcale.
 - **Warstwa danych celowo nie filtruje po `user_id`.** Izolację wymusza wyłącznie RLS. To świadoma decyzja: ręczny filtr w kodzie maskowałby ewentualny brak polityki w bazie i sprawiałby, że luka byłaby niewidoczna.
 
@@ -155,12 +155,12 @@ Trasy aplikacji:
 
 | Trasa                 | Opis                                                |
 | --------------------- | --------------------------------------------------- |
-| `/`                   | Strona startowa                                     |
+| `/`                   | Wizytówka dla gościa; zalogowany trafia na `/dashboard` |
 | `/auth/signup`        | Rejestracja                                         |
 | `/auth/signin`        | Logowanie                                           |
 | `/auth/confirm-email` | Informacja o potwierdzeniu adresu po rejestracji    |
 | `/dashboard`          | Lista zadań — chroniona, przekierowuje na logowanie |
-| `/api/tasks`          | Lista i tworzenie zadań (`GET`, `POST`)             |
+| `/api/tasks`          | Tworzenie zadania (`POST`); listę pobiera serwerowo `dashboard.astro` |
 | `/api/tasks/[id]`     | Edycja i usunięcie zadania (`PATCH`, `DELETE`)      |
 
 ## Wdrożenie

@@ -22,8 +22,6 @@ import type { Task } from "@/types";
  * "zapisaną" w propsach. Wyspa liczy pilność sama, przy każdym renderze
  * (AGENTS.md, "Hard rules").
  */
-const { user } = Astro.locals;
-
 /**
  * Jedyny komunikat o błędzie odczytu, jaki dociera do przeglądarki.
  *
@@ -70,8 +68,7 @@ if (supabase === null) {
           Moje zadania
         </h1>
         <p class="mt-1 text-sm text-blue-100/60">
-          Zalogowano jako <span class="font-semibold text-white">{user?.email}</span>. Zadania z terminem w ciągu
-          najbliższych 48 godzin są automatycznie oznaczane jako pilne.
+          Zadania z terminem w ciągu najbliższych 48 godzin są automatycznie oznaczane jako pilne.
         </p>
       </header>
 
