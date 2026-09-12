@@ -80,7 +80,7 @@ Nie tylko atrapy — poniższe przeszło przez realny Supabase i realny serwer S
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Supabase   | Projekt istnieje, ref **`mntmewcgdicumlcuwpjq`**, katalog zlinkowany. `.env` i `.dev.vars` utworzone lokalnie i ignorowane przez gita. **Migracja ZASTOSOWANA** — `GET /rest/v1/tasks` jako `anon` zwraca `42501 permission denied`, i to jest zachowanie poprawne: uprawnienia ma wyłącznie rola `authenticated`. NIE wykonuj podpowiedzi Postgresa o `GRANT ... TO anon` |
 | GitHub     | Repo `https://github.com/slawomirmatyjasek/tasks`, gałąź `main` **wypchnięta**. **CI przeszło na zielono** (typecheck, lint, 150 testów, build)                                                                                                                                                                                                                            |
-| Cloudflare | **Niezalogowany.** `wrangler whoami` → „You are not authenticated"                                                                                                                                                                                                                                                                                                         |
+| Cloudflare | **Wdrożone:** https://pilne.pilne.workers.dev — Worker `pilne`, sekrety `SUPABASE_URL` i `SUPABASE_KEY` wgrane, KV `pilne-session` utworzone automatycznie. Konto: slawomir.matyjasek@softvig.pl                                                                                                                                                                           |
 
 **Sekrety:** nie ma ich w repo i nie wolno ich tam wprowadzać. `SUPABASE_URL`
 i `SUPABASE_KEY` (klucz publishable) są w `.env` i `.dev.vars` na dysku. Jeśli
@@ -112,11 +112,32 @@ pojawić się `403` i potrzebny będzie Personal Access Token.
 
 Settings → Secrets and variables → Actions: `SUPABASE_URL`, `SUPABASE_KEY`.
 
-### Krok 5 — deploy na Cloudflare
+### Krok 5 — ZROBIONE: wdrożenie produkcyjne
 
-Dopiero po kroku 2. `wrangler login` wymaga przeglądarki, więc robi to człowiek.
-Potem `npm run build` i `npx wrangler deploy`, a sekrety przez
-`npx wrangler secret put SUPABASE_URL` (i analogicznie `SUPABASE_KEY`).
+**https://pilne.pilne.workers.dev**
+
+Zweryfikowane na produkcji: strona główna bez banera o brakującej konfiguracji,
+`/dashboard` bez sesji przekierowuje na logowanie, rejestracja i logowanie przez
+aplikację działają, `POST /api/tasks` zwraca 201, a dashboard renderuje flagę
+pilności poprawnie rozróżniając przypadki (termin za 20h → pilne, za tydzień → nie).
+
+Uwagi na przyszłość:
+
+- Pierwsze żądania po utworzeniu subdomeny `workers.dev` kończą się błędem
+  handshake'u TLS — certyfikat propaguje się przez ~30 sekund. To nie jest błąd
+  aplikacji, wystarczy ponowić.
+- `curl` z Git Basha używa schannel i bywa zawodny wobec Cloudflare; `fetch`
+  z Node działa stabilnie.
+- Ponowne wdrożenie: `npm run build && npx wrangler deploy`. Sekrety zostają
+  między wdrożeniami, nie trzeba ich wgrywać ponownie.
+
+### Krok 6 — pozostałe drobiazgi
+
+- Sprawdź w przeglądarce, czy po hydracji termin pokazuje się w Twojej strefie
+  (SSR renderuje w UTC celowo — patrz commit `2403800`).
+- Skasuj konta testowe w Authentication → Users: `rls-a-1789249572@proton.me`,
+  `rls-b-1789249572@proton.me`, `prod-test-1789250343352@proton.me`.
+- Rozważ ponowne włączenie potwierdzania e-maila po zgłoszeniu projektu.
 
 ## 5. Znane długi — świadomie odłożone
 

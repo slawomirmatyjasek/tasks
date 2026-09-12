@@ -1,5 +1,7 @@
 # 10x Astro Starter
 
+**Live:** https://pilne.pilne.workers.dev
+
 ![](./public/template.png)
 
 A modern, opinionated starter template for building fast, accessible web applications.
