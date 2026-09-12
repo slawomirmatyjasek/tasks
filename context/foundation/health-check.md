@@ -71,13 +71,13 @@ Provider: GitHub Actions
 Configuration: .github/workflows/ci.yml
 ```
 
-| Stage      | Status | Notes                                      |
-|------------|--------|---------------------------------------------|
-| Lint       | ✓      | `npm run lint` (eslint)                     |
-| Test       | ✗      | not configured — no test runner yet         |
+| Stage      | Status | Notes                                                         |
+| ---------- | ------ | ------------------------------------------------------------- |
+| Lint       | ✓      | `npm run lint` (eslint)                                       |
+| Test       | ✗      | not configured — no test runner yet                           |
 | Build      | ✓      | `npm run build` (astro build, needs SUPABASE_URL/KEY secrets) |
 | Type check | ✓      | `npx astro sync` + strict tsconfig (`astro/tsconfigs/strict`) |
-| Security   | ✗      | not configured — no `npm audit` step in CI  |
+| Security   | ✗      | not configured — no `npm audit` step in CI                    |
 
 ## Configuration
 

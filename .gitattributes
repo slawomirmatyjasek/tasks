@@ -1,0 +1,8 @@
+# Normalizacja koncow linii — bez tego Prettier w CI pada na plikach z CRLF
+* text=auto eol=lf
+
+# Pliki binarne
+*.png binary
+*.jpg binary
+*.ico binary
+*.svg text eol=lf

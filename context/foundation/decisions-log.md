@@ -9,6 +9,7 @@ Zapisane 2026-09-04. Ten plik jest punktem powrotu, gdyby trzeba było wznowić 
 Kurs: **10xDevs 3.0** (Przeprogramowani.pl). Start pełnego programu: 18 maja 2026. Koniec szkolenia: 19 czerwca 2026. Terminy zgłoszenia projektu zaliczeniowego: 5 lipca / 10 sierpnia / 14 września 2026.
 
 ### 6 wymogów zaliczenia (dosłownie z pliku 42)
+
 1. Kontrola dostępu odpowiednia do typu aplikacji
 2. Zarządzanie danymi (sensowny CRUD, nie sztuczna lista)
 3. Logika biznesowa opisywalna jednym zdaniem (klasyfikuje/rekomenduje/waliduje/przelicza)
@@ -44,14 +45,14 @@ Rozważane były dwie opcje:
 
 Domyślny stack kursu (z `td/prework/41-tech-stack-overview.md`) — pasuje bez zastrzeżeń, bo spełnia 4 bramki (typowany / oparty o konwencje / popularny / dobrze udokumentowany):
 
-| Warstwa | Wybór |
-|---|---|
-| Meta-framework + API | Astro 6 |
-| Komponenty UI | React 19 |
-| System typów | TypeScript |
-| Stylowanie | Tailwind CSS 4 |
-| Backend + baza + auth | Supabase |
-| Deployment | Cloudflare (Pages/Workers) |
+| Warstwa               | Wybór                      |
+| --------------------- | -------------------------- |
+| Meta-framework + API  | Astro 6                    |
+| Komponenty UI         | React 19                   |
+| System typów          | TypeScript                 |
+| Stylowanie            | Tailwind CSS 4             |
+| Backend + baza + auth | Supabase                   |
+| Deployment            | Cloudflare (Pages/Workers) |
 
 **Ważne wyjaśnienie (żeby nie było znów nieporozumienia):** to nie jest 6 osobnych aplikacji/kont. Astro, React, TypeScript, Tailwind to biblioteki w jednym repozytorium (dochodzą jedną komendą CLI). Realnie zakładane są **tylko 2 konta zewnętrzne**: Supabase (baza + auth) i Cloudflare (hosting).
 

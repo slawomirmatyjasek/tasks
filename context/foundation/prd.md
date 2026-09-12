@@ -17,7 +17,7 @@ timeline_budget:
 
 ## Vision & Problem Statement
 
-Osoba prowadząca kilka spraw jednocześnie po godzinach — zakupy, drobne naprawy, sprawy urzędowe, prywatne zobowiązania — zapisuje zadania z terminami, ale przy liście dłuższej niż kilkanaście pozycji traci orientację, które z nich wymagają działania *teraz*, a które mogą poczekać. Skutkiem jest przegapiony termin i poczucie, że lista zadań rośnie szybciej niż da się ją ogarnąć.
+Osoba prowadząca kilka spraw jednocześnie po godzinach — zakupy, drobne naprawy, sprawy urzędowe, prywatne zobowiązania — zapisuje zadania z terminami, ale przy liście dłuższej niż kilkanaście pozycji traci orientację, które z nich wymagają działania _teraz_, a które mogą poczekać. Skutkiem jest przegapiony termin i poczucie, że lista zadań rośnie szybciej niż da się ją ogarnąć.
 
 Samo sortowanie po dacie pokazuje kolejność, ale nie odpowiada na pytanie "co muszę zrobić dziś". Pojedynczy, automatyczny sygnał pilności — bez ręcznego oznaczania priorytetu — usuwa potrzebę skanowania każdej daty osobno.
 
@@ -28,13 +28,16 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 ## Success Criteria
 
 ### Primary
+
 - Użytkownik po otwarciu listy zadań od razu widzi, które zadania są pilne, bez ręcznego filtrowania czy sortowania.
 - Każde zadanie z terminem w ciągu najbliższych 48h i nieoznaczone jako ukończone jest automatycznie oznaczone jako pilne.
 
 ### Secondary
+
 - Użytkownik rzadziej przegapia terminy zadań (nie mierzone bezpośrednio w MVP).
 
 ### Guardrails
+
 - Zadania jednego użytkownika nigdy nie są widoczne dla innego użytkownika.
 - Oznaczenie zadania jako ukończone nigdy nie usuwa go bezpowrotnie w tle bez akcji użytkownika.
 
@@ -47,6 +50,7 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 - **Then** zadanie pojawia się na jego liście, posortowane po terminie
 
 #### Acceptance Criteria
+
 - Tytuł jest wymagany i niepusty
 - Termin wykonania jest wymagany
 - Nowe zadanie domyślnie ma status "nieukończone"
@@ -58,6 +62,7 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 - **Then** zadanie jest widocznie oznaczone jako "pilne"
 
 #### Acceptance Criteria
+
 - Próg pilności to dokładnie 48h liczone od bieżącego momentu
 - Zadanie ukończone nigdy nie pokazuje flagi pilności, niezależnie od terminu
 - Flaga jest wyliczana na bieżąco przy każdym wyświetleniu listy, nie zapisywana jako stała wartość
@@ -69,6 +74,7 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 - **Then** znika z widoku aktywnych/pilnych zadań, a jego flaga pilności znika
 
 #### Acceptance Criteria
+
 - Ukończone zadanie pozostaje dostępne (np. w osobnym widoku), nie jest kasowane
 - Można cofnąć oznaczenie ukończenia
 
@@ -79,6 +85,7 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 - **Then** zmiana jest trwale zapisana, a status pilności przeliczany na nowo
 
 #### Acceptance Criteria
+
 - Usunięcie zadania jest nieodwracalne i wymaga potwierdzenia
 - Zmiana terminu natychmiast wpływa na flagę pilności przy kolejnym wyświetleniu
 
@@ -89,17 +96,20 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 - **Then** widzi wyłącznie zadania, które sam utworzył
 
 #### Acceptance Criteria
+
 - Niezalogowany użytkownik trafiający na ścieżkę listy zadań jest przekierowany do logowania
 - Próba odczytu/edycji cudzego zadania kończy się odmową dostępu
 
 ## Functional Requirements
 
 ### Uwierzytelnianie
+
 - FR-001: [Użytkownik] może zarejestrować się przy pomocy adresu email i hasła. Priority: must-have
 - FR-002: [Użytkownik] może się zalogować i wylogować. Priority: must-have
 - FR-003: [Niezalogowany gość] jest przekierowywany do logowania przy próbie wejścia na ścieżki zadań. Priority: must-have
 
 ### Zarządzanie zadaniami
+
 - FR-004: [Użytkownik] może utworzyć zadanie z tytułem i terminem wykonania. Priority: must-have
 - FR-005: [Użytkownik] może przeglądać listę własnych zadań. Priority: must-have
 - FR-006: [Użytkownik] może edytować tytuł i termin istniejącego zadania. Priority: must-have
@@ -107,6 +117,7 @@ Kasia, 32 lata, koordynatorka projektów. Prowadzi prywatną listę spraw równo
 - FR-008: [Użytkownik] może oznaczyć zadanie jako ukończone lub cofnąć to oznaczenie. Priority: must-have
 
 ### Priorytetyzacja
+
 - FR-009: [System] automatycznie oznacza zadanie jako pilne, gdy termin przypada w ciągu 48h i zadanie nie jest ukończone. Priority: must-have
 - FR-010: [Użytkownik] może wyróżnić/przefiltrować pilne zadania na liście. Priority: nice-to-have
 
