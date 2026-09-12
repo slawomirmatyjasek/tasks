@@ -1,27 +1,89 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import Topbar from "@/components/Topbar.astro";
+import TaskList from "@/components/tasks/TaskList";
+import { createClient } from "@/lib/supabase";
+import { listTasks } from "@/lib/tasks";
+import type { Task } from "@/types";
 
+/**
+ * Lista zadań zalogowanego użytkownika (FR-005 / US-05).
+ *
+ * Dostęp pilnuje middleware (`PROTECTED_ROUTES`), więc do tego miejsca dociera
+ * wyłącznie zalogowany użytkownik. Zakres wierszy wyznacza RLS powiązana
+ * z sesją z ciasteczek — strona nie filtruje po `user_id` samodzielnie.
+ *
+ * Lista jest pobierana po stronie serwera i wstrzykiwana do wyspy React jako
+ * props, żeby pierwszy render nie migał pustką i żeby zadania były widoczne
+ * także zanim JS się zhydratyzuje.
+ *
+ * `is_urgent` jest tu świadomie odcinane. `listTasks()` wylicza je dla momentu
+ * renderu SSR, ale przekazanie tej wartości dalej zamieniłoby ją w wartość
+ * "zapisaną" w propsach. Wyspa liczy pilność sama, przy każdym renderze
+ * (AGENTS.md, "Hard rules").
+ */
 const { user } = Astro.locals;
+
+/**
+ * Jedyny komunikat o błędzie odczytu, jaki dociera do przeglądarki.
+ *
+ * Treść wyjątku z `listTasks()` niesie komunikat PostgREST wraz z kodem
+ * Postgresa i nazwą tabeli (np. `permission denied for table tasks [42501]`),
+ * czyli wycieka schemat i stan konfiguracji. Oryginał trafia do logu serwera,
+ * użytkownik dostaje stałe, ogólne zdanie.
+ */
+const LOAD_ERROR_MESSAGE = "Nie udało się wczytać zadań. Odśwież stronę lub spróbuj ponownie za chwilę.";
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+let tasks: Task[] = [];
+let loadError: string | null = null;
+
+if (supabase === null) {
+  // Gałąź nieosiągalna przy obecnym middleware: gdy `createClient()` zwraca
+  // `null`, middleware ustawia `locals.user = null` i przekierowuje /dashboard
+  // na /auth/signin, zanim ta strona zdąży się wyrenderować. Zostawiona
+  // świadomie jako zabezpieczenie na wypadek zmiany zachowania middleware
+  // (np. dopuszczenia tej ścieżki bez klienta) — nie szukaj sposobu, żeby tu
+  // dotrzeć w obecnej wersji, bo go nie ma.
+  loadError =
+    "Supabase nie jest skonfigurowany — lista zadań jest niedostępna. Uzupełnij SUPABASE_URL i SUPABASE_KEY w pliku .env (lub .dev.vars) i odśwież stronę.";
+} else {
+  try {
+    tasks = (await listTasks(supabase)).map(({ is_urgent: _isUrgent, ...task }) => task);
+  } catch (error) {
+    // Szczegóły zostają na serwerze; do wyspy idzie wyłącznie stały komunikat.
+    // eslint-disable-next-line no-console -- log diagnostyczny po stronie serwera (Workers), celowy
+    console.error("[dashboard] Nie udało się pobrać listy zadań:", error);
+    loadError = LOAD_ERROR_MESSAGE;
+  }
+}
 ---
 
-<Layout title="Dashboard">
-  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
-    <div class="rounded-2xl border border-white/10 bg-white/10 p-8 text-center text-white backdrop-blur-xl">
-      <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
-        Dashboard
-      </h1>
-      <p class="text-blue-100/80">
-        Welcome, <span class="font-semibold text-white">{user?.email}</span>
-      </p>
-      <p class="mt-2 text-sm text-blue-100/50">This page is only for authenticated users.</p>
-      <form method="POST" action="/api/auth/signout" class="mt-6">
-        <button
-          type="submit"
-          class="rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
-        >
-          Sign out
-        </button>
-      </form>
+<Layout title="Pilne — moje zadania">
+  <div class="bg-cosmic min-h-screen p-4">
+    <div class="mx-auto w-full max-w-3xl">
+      <Topbar />
+
+      <header class="mb-6">
+        <h1 class="bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+          Moje zadania
+        </h1>
+        <p class="mt-1 text-sm text-blue-100/60">
+          Zalogowano jako <span class="font-semibold text-white">{user?.email}</span>. Zadania z terminem w ciągu
+          najbliższych 48 godzin są automatycznie oznaczane jako pilne.
+        </p>
+      </header>
+
+      {
+        supabase === null ? (
+          <p role="alert" class="rounded-xl border border-red-500/30 bg-red-900/30 px-4 py-3 text-sm text-red-200">
+            {loadError}
+          </p>
+        ) : (
+          <TaskList initialTasks={tasks} loadError={loadError} client:load />
+        )
+      }
     </div>
   </div>
 </Layout>
