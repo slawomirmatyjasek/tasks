@@ -117,3 +117,17 @@ create policy tasks_delete_own
   for delete
   to authenticated
   using (auth.uid() = user_id);
+
+-- ---------------------------------------------------------------------------
+-- Uprawnienia dla Data API
+-- ---------------------------------------------------------------------------
+-- Domyślnie Supabase nadaje je nowym tabelom automatycznie, ale ta opcja bywa
+-- wyłączana (sam panel zaleca jej wyłączenie). Bez uprawnień PostgREST zwraca
+-- `permission denied for table tasks`, mimo poprawnych polityk RLS — to dwie
+-- niezależne warstwy: GRANT decyduje, czy rola w ogóle dosięga tabeli, RLS
+-- decyduje, które wiersze widzi. Nadajemy je wprost, żeby migracja nie zależała
+-- od ustawienia projektu.
+--
+-- Rola `anon` celowo NIE dostaje nic: zadania są wyłącznie dla zalogowanych
+-- (FR-003, US-05), a niezalogowany i tak nie przeszedłby polityk RLS.
+grant select, insert, update, delete on public.tasks to authenticated;
