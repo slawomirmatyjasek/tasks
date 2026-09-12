@@ -17,7 +17,13 @@ Pilne to lista zadań z automatyczną flagą pilności, zbudowana na starterze `
 
 ## Testy
 
-Brak jeszcze test runnera (znany, oczekiwany gap przed modułem 3 — patrz health-check.md). Przed zgłoszeniem projektu musi istnieć co najmniej jeden test pokrywający US-02: zadanie z terminem ≤48h i nieukończone renderuje się z flagą pilności; ukończone zadanie nigdy, niezależnie od terminu. Dodaj go Vitestem dopiero po lekcjach M3 — nie przeskakuj od razu do Playwrighta dla tego przypadku.
+Runner: **Vitest 5** (`npm test`, `npm run test:watch`, `npm run test:coverage`). Testy leżą obok kodu jako `src/**/*.test.ts`, środowisko `node`, `globals: false` — importuj `describe`/`it`/`expect` jawnie z `vitest`.
+
+Reguła pilności (`src/lib/urgency.ts`) jest pokryta z obu stron granicy 48h wraz z przypadkami: ukończone po terminie, przeterminowane nieukończone, data nieparsowalna i nieistniejąca w kalendarzu. **Każdy test czasowy musi wstrzykiwać `now`** — test zależny od zegara systemowego przechodzi rano i pada wieczorem, więc jest gorszy niż jego brak.
+
+Testując `src/lib/tasks.ts`, używaj ręcznej atrapy klienta Supabase (wzorzec `createSupabaseStub` w `src/lib/tasks.test.ts`) — nie dociągaj bibliotek do mockowania.
+
+Nie testuj tego, jak funkcja jest napisana, tylko jakie zachowanie gwarantuje. Przy zmianie reguły biznesowej sprawdź, czy test faktycznie pada po jej odwróceniu — zielony test, który przeżywa mutację, niczego nie chroni.
 
 ## Commity
 

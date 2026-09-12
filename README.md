@@ -111,7 +111,14 @@ npx supabase stop
 
 The local Studio UI is available at `http://localhost:54323`.
 
-No database tables or migrations are required — this project uses Supabase Auth's built-in `auth.users` table only.
+### Applying migrations
+
+This project **does** require a database migration: `supabase/migrations/` creates the `tasks` table together with its row level security policies. Without it, signing in succeeds but `/dashboard` fails to load the task list.
+
+```bash
+npx supabase db push          # cloud project linked with `npx supabase link`
+npx supabase migration up     # local stack started with `npx supabase start`
+```
 
 ### Using a cloud Supabase project instead
 
@@ -125,6 +132,13 @@ If you prefer to use a hosted Supabase project, add these variables to your `.en
 ```
 SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_KEY=<anon-key>
+```
+
+Then link the project and apply the migration:
+
+```bash
+npx supabase link --project-ref <project-ref>
+npx supabase db push
 ```
 
 ### Email confirmation in local development
@@ -168,7 +182,7 @@ Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or
 
 ## CI
 
-GitHub Actions runs lint + build on every push and PR to `master`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
+GitHub Actions runs type check, lint, unit tests and build on every push and PR to `master`. Configure `SUPABASE_URL` and `SUPABASE_KEY` as repository secrets in GitHub for the build step.
 
 ## License
 
