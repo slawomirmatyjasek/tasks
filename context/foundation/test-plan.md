@@ -19,7 +19,7 @@ Testy w tym projekcie podlegają trzem regułom, od których nie ma odstępstw:
 Zakres skanowania zmienności użyty do ważenia prawdopodobieństwa: `src/`, `supabase/`.
 **Zastrzeżenie:** historia gita to jeden commit (bootstrap, 2026-09-08) — poniżej progu 5 commitów/30 dni. Skan zmienności nie dał sygnału; oceny prawdopodobieństwa opierają się wyłącznie na PRD, roadmapie i stanie artefaktów. Nie przeprowadzono też wywiadu z użytkownikiem (Faza 2 procedury) — to jest znany, jawny brak tego planu i pierwsza rzecz do uzupełnienia przy `--refresh`.
 
-**Stan bazowy — uczciwie.** 69 testów jednostkowych w dwóch plikach, wszystkie zielone: reguła pilności (41) i warstwa danych na ręcznej atrapie klienta bazy (28). Zero testów integracyjnych. Zero testów E2E. **Zero testów przechodzących przez prawdziwą bazę, prawdziwe RLS, prawdziwe żądanie HTTP i prawdziwą przeglądarkę.** Profil bazy testowej: `sparse` — runner skonfigurowany, testy skupione wyłącznie w `src/lib/`, reszta aplikacji bez pokrycia.
+**Stan bazowy — uczciwie.** Zaktualizowane 2026-09-13. 150 testów jednostkowych w czterech plikach (reguła pilności, warstwa danych na ręcznej atrapie klienta bazy, kontrakt endpointów, konwersja terminów) oraz **8 testów integracyjnych wobec prawdziwej instancji Supabase** (`src/lib/rls.itest.ts`, osobny runner `npm run test:integration`). Zero testów E2E — żaden test nie przechodzi przez prawdziwe żądanie HTTP do aplikacji ani przez przeglądarkę; testy integracyjne rozmawiają z bazą bezpośrednio, z pominięciem warstwy Astro. Profil bazy testowej: `sparse` — testy skupione w `src/lib/`, strony, middleware i komponenty bez pokrycia automatycznego.
 
 ## 2. Risk Map
 
@@ -55,10 +55,12 @@ Każdy wiersz to osobna faza wdrożenia, która otworzy własny folder zmiany pr
 
 | #   | Phase name                        | Goal (one line)                                                                                  | Risks covered   | Test types            | Status      | Change folder |
 | --- | --------------------------------- | ------------------------------------------------------------------------------------------------ | --------------- | --------------------- | ----------- | ------------- |
-| 1   | Izolacja i trwałość danych        | Udowodnić, że dane przeżywają zapis na prawdziwej bazie i że konto B nie sięgnie zadań konta A   | #1, #2          | integration           | not started | —             |
-| 2   | Reguła czasu poza modułem czystym | Udowodnić, że termin i flaga pilności przetrwają drogę formularz → zapis → odczyt → ekran        | #3, #4, #6      | integration, contract | not started | —             |
+| 1   | Izolacja i trwałość danych        | Udowodnić, że dane przeżywają zapis na prawdziwej bazie i że konto B nie sięgnie zadań konta A   | #1, #2          | integration           | częściowo — #2 pokryte (`src/lib/rls.itest.ts`), #1 nie | —             |
+| 2   | Reguła czasu poza modułem czystym | Udowodnić, że termin i flaga pilności przetrwają drogę formularz → zapis → odczyt → ekran        | #3, #4, #6      | integration, contract | częściowo — #3 i #6 pokryte na ścieżce zapis → odczyt, #4 (rozjazd SSR ↔ przeglądarka) nie | —             |
 | 3   | Kluczowy przepływ w przeglądarce  | Udowodnić przepływ z US-01/US-02/US-05 bez ręcznego klikania, wraz z nieodwracalnością usunięcia | #2, #7          | e2e                   | not started | —             |
 | 4   | Bramki i higiena dostępu          | Zablokować regresję w CI i domknąć wymaganie o nieujawnianiu istnienia konta                     | #5, przekrojowe | gates, manual smoke   | not started | —             |
+
+Ryzyko #7 (nieodwracalna utrata zadania) zostało pokryte poza swoją fazą — test „ukończenie nie kasuje wiersza i daje się cofnąć" wszedł razem z Fazą 1, bo korzysta z tej samej infrastruktury dwóch kont. W Fazie 3 zostaje z niego wyłącznie potwierdzenie usunięcia w interfejsie.
 
 Faza 3 jest warunkowa — zależy od decyzji z `roadmap.md` §Open Roadmap Questions p. 4 (czy E2E wchodzi w zakres MVP). Jeśli odpowiedź brzmi "nie", fazę zamyka się z jednolinijkową notatką o pominięciu, a jej ryzyka zostają przy Fazach 1 i 2 plus ręczny smoke.
 

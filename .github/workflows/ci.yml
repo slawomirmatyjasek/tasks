@@ -24,3 +24,15 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+      # Testy integracyjne rozmawiaja z prawdziwa instancja Supabase i dwoma
+      # kontami testowymi. Bez kompletu sekretow zestaw sam sie pomija, wiec
+      # krok jest zielony takze w forku, ktory tych sekretow nie ma.
+      - run: npm run test:integration
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          PILNE_TEST_A_EMAIL: ${{ secrets.PILNE_TEST_A_EMAIL }}
+          PILNE_TEST_A_PASSWORD: ${{ secrets.PILNE_TEST_A_PASSWORD }}
+          PILNE_TEST_B_EMAIL: ${{ secrets.PILNE_TEST_B_EMAIL }}
+          PILNE_TEST_B_PASSWORD: ${{ secrets.PILNE_TEST_B_PASSWORD }}

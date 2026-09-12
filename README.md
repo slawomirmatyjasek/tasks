@@ -104,6 +104,7 @@ npm run dev
 | `npm test`              | Testy jednostkowe (jednorazowo)                       |
 | `npm run test:watch`    | Testy w trybie obserwowania                           |
 | `npm run test:coverage` | Testy z raportem pokrycia                             |
+| `npm run test:integration` | Testy integracyjne wobec prawdziwej bazy (patrz niżej) |
 
 ## Bramki jakości
 
@@ -116,7 +117,7 @@ npx astro check   # kontrola typów
 npm run build     # build produkcyjny
 ```
 
-CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) uruchamia się **na każdy push i każdy pull request do `main`** i wykonuje na Node 22 dokładnie tę samą sekwencję: `npm ci` → `npx astro sync` → `npx astro check` → `npm run lint` → `npm test` → `npm run build`. Krok budowania wymaga sekretów repozytorium `SUPABASE_URL` i `SUPABASE_KEY` (Settings → Secrets and variables → Actions).
+CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) uruchamia się **na każdy push i każdy pull request do `main`** i wykonuje na Node 22 dokładnie tę samą sekwencję: `npm ci` → `npx astro sync` → `npx astro check` → `npm run lint` → `npm test` → `npm run build`, a na koniec `npm run test:integration`. Krok budowania wymaga sekretów repozytorium `SUPABASE_URL` i `SUPABASE_KEY` (Settings → Secrets and variables → Actions); krok integracyjny dodatkowo czterech zmiennych z danymi dwóch kont testowych — bez nich sam się pomija, zamiast wywracać pipeline.
 
 ## Testy
 
@@ -131,16 +132,30 @@ CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) uruchamia się **na 
 
 W zestawie obowiązują dwie zasady: **każdy test czasowy wstrzykuje własny moment odniesienia** (test zależny od zegara systemowego przechodzi rano i pada wieczorem, więc jest gorszy niż jego brak), a testy sprawdzają gwarantowane zachowanie, nie sposób napisania funkcji.
 
+### Testy integracyjne (prawdziwa baza)
+
+`src/lib/rls.itest.ts`, uruchamiane osobno przez `npm run test:integration` (konfiguracja: `vitest.integration.config.ts`). **Osiem testów logujących się na dwa prawdziwe konta** w instancji Supabase i wywołujących produkcyjne funkcje z `src/lib/tasks.ts` — nie atrapę.
+
+Pokrywają ryzyka z [`context/foundation/test-plan.md`](context/foundation/test-plan.md), których nie da się sprawdzić bez bazy:
+
+| Ryzyko | Co jest sprawdzane |
+| ------ | ------------------ |
+| #2 | Konto B nie widzi zadania konta A na liście, nie zmieni go, nie usunie i nie wstawi wiersza z cudzym `user_id`. Osobny test potwierdza, że **właściciel przechodzi tą samą ścieżką bez przeszkód** — inaczej odmowy niczego by nie dowodziły |
+| #7 | Ukończenie zadania nie kasuje wiersza, gasi flagę pilności i daje się cofnąć |
+| #3, #6 | Zapisany moment terminu jest po odczycie tym samym momentem, a flaga pilności zgadza się z terminem po obu stronach progu 48 h |
+
+Wymagają czterech zmiennych środowiskowych z danymi dwóch **różnych** kont (`PILNE_TEST_A_*`, `PILNE_TEST_B_*` — wzór w `.env.example`). Bez nich zestaw jest pomijany, a nie czerwony: brak konfiguracji to nie regresja produktu. Po sobie sprzątają — każde utworzone zadanie jest usuwane w `afterAll`.
+
 ### Czego w tych testach nie ma
 
 Warto wiedzieć, zanim ktoś uzna pokrycie za pełne:
 
-- **Zero testów integracyjnych i zero testów E2E.** Cały zestaw to testy jednostkowe.
-- **Żaden automatyczny test nie przechodzi przez prawdziwą bazę, prawdziwe RLS, prawdziwe żądanie HTTP ani prawdziwą przeglądarkę.** Warstwa danych jest testowana na ręcznej atrapie klienta, a atrapa nie zna RLS — sama z siebie nie udowodni izolacji kont.
+- **Zero testów E2E.** Żaden automatyczny test nie przechodzi przez prawdziwe żądanie HTTP do aplikacji ani przez przeglądarkę — testy integracyjne rozmawiają z bazą bezpośrednio, z pominięciem warstwy Astro (middleware, endpointy, render strony).
+- **Ryzyka #1, #4 i #5 z planu testów nie mają pokrycia automatycznego** — odpowiednio: brak sekretów lub migracji wyglądający jak pusta lista, rozjazd flagi między renderem serwera a przeglądarką, oraz komunikat błędu zdradzający istnienie konta.
 - Testy skupiają się w `src/lib/` i `src/components/tasks/`. Strony Astro, middleware i komponenty uwierzytelniania nie mają pokrycia automatycznego.
 - Dostępność jest sprawdzana wyłącznie statycznie (`eslint-plugin-jsx-a11y`), bez testów w czasie wykonania.
 
-Izolacja danych między kontami została zweryfikowana **ręcznie** na prawdziwej bazie (przebieg opisany w [`context/handoff.md`](context/handoff.md)). To jest dowód, ale nie jest to test pilnujący regresji w CI. Fazy testów integracyjnych i E2E są opisane i wycenione w [`context/foundation/test-plan.md`](context/foundation/test-plan.md) ze statusem „not started".
+Izolacja kont ma dziś test pilnujący regresji (patrz wyżej), a nie tylko jednorazową weryfikację ręczną. Faza testów przeglądarkowych pozostaje opisana i wyceniona w [`context/foundation/test-plan.md`](context/foundation/test-plan.md) ze statusem „not started".
 
 ## Kontrola dostępu
 
