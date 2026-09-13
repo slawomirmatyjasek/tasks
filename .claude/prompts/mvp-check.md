@@ -25,10 +25,11 @@ Są one oceniane oddzielnie (np. na podstawie przesłanych zrzutów ekranu). Oce
 
 Proszę przeanalizować ten projekt pod kątem poniższych minimalnych wymagań technicznych.
 Wymagania te są celowo skromne — celem jest potwierdzenie solidnych podstaw technicznych, a nie wymaganie dużej aplikacji. Dla każdego kryterium podaj:
+
 - Jasny status ✅ (spełnione) lub ❌ (niespełnione)
 - Krótkie wyjaśnienie, co zostało znalezione lub czego brakuje
 - Dla spełnionych kryteriów, wskaż konkretne dowody (ścieżki plików, nazwy funkcji)
-Każde ✅ opieraj na dowodach, które faktycznie zlokalizowałeś w repozytorium. Jeśli nie możesz znaleźć dowodów na dane kryterium, oznacz je ❌ zamiast zakładać, że istnieje — ale pamiętaj, że poprzeczka jest "minimalna", więc nie wymagaj więcej niż każde kryterium.
+  Każde ✅ opieraj na dowodach, które faktycznie zlokalizowałeś w repozytorium. Jeśli nie możesz znaleźć dowodów na dane kryterium, oznacz je ❌ zamiast zakładać, że istnieje — ale pamiętaj, że poprzeczka jest "minimalna", więc nie wymagaj więcej niż każde kryterium.
 
 ## Kryteria analizy:
 
@@ -57,7 +58,7 @@ Każde ✅ opieraj na dowodach, które faktycznie zlokalizowałeś w repozytoriu
     - Szukaj dokumentu planu testów (np. test-plan.md), który definiuje ryzyko(a), które testy
       mają pokrywać. Najpierw sprawdź katalog context/ (np.
       context/foundation/test-plan.md), a następnie .ai/ lub docs/.
-    - Następnie potwierdź, że istnieje co najmniej jeden rzeczywisty test (*.test.*, *.spec.* lub katalog testowy)
+    - Następnie potwierdź, że istnieje co najmniej jeden rzeczywisty test (_.test._, _.spec._ lub katalog testowy)
       i znacząco sprawdza to ryzyko. Dowolny framework jest w porządku (Vitest, Jest,
       Playwright, pytest, Go test itp.).
     - W swoim wyjaśnieniu podaj konkretne ryzyko z planu testów ORAZ konkretny test,
@@ -88,7 +89,7 @@ Każde ✅ opieraj na dowodach, które faktycznie zlokalizowałeś w repozytoriu
 Po analizie podaj:
 
 1.  **Listę kontrolną** z wyraźnym ✅/❌ dla każdego z 5 kryteriów
-2.  **Status projektu**: Oblicz procent (X/5 * 100)
+2.  **Status projektu**: Oblicz procent (X/5 \* 100)
 3.  **Priorytetowe ulepszenia**: Dla każdego niespełnionego kryterium, podaj konkretne, możliwe do wykonania wskazówki
     dostosowane do typu i stosu tego projektu
 

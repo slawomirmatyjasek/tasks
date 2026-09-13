@@ -53,12 +53,12 @@ Wysoki wpływ × niskie prawdopodobieństwo (np. awaria dostawcy bazy) świadomi
 
 Każdy wiersz to osobna faza wdrożenia, która otworzy własny folder zmiany przez `/10x-new`. Status przesuwa się od lewej do prawej; orkiestrator aktualizuje go, gdy artefakty pojawiają się na dysku.
 
-| #   | Phase name                        | Goal (one line)                                                                                  | Risks covered   | Test types            | Status      | Change folder |
-| --- | --------------------------------- | ------------------------------------------------------------------------------------------------ | --------------- | --------------------- | ----------- | ------------- |
-| 1   | Izolacja i trwałość danych        | Udowodnić, że dane przeżywają zapis na prawdziwej bazie i że konto B nie sięgnie zadań konta A   | #1, #2          | integration           | częściowo — #2 pokryte (`src/lib/rls.itest.ts`), #1 nie | —             |
+| #   | Phase name                        | Goal (one line)                                                                                  | Risks covered   | Test types            | Status                                                                                     | Change folder |
+| --- | --------------------------------- | ------------------------------------------------------------------------------------------------ | --------------- | --------------------- | ------------------------------------------------------------------------------------------ | ------------- |
+| 1   | Izolacja i trwałość danych        | Udowodnić, że dane przeżywają zapis na prawdziwej bazie i że konto B nie sięgnie zadań konta A   | #1, #2          | integration           | częściowo — #2 pokryte (`src/lib/rls.itest.ts`), #1 nie                                    | —             |
 | 2   | Reguła czasu poza modułem czystym | Udowodnić, że termin i flaga pilności przetrwają drogę formularz → zapis → odczyt → ekran        | #3, #4, #6      | integration, contract | częściowo — #3 i #6 pokryte na ścieżce zapis → odczyt, #4 (rozjazd SSR ↔ przeglądarka) nie | —             |
-| 3   | Kluczowy przepływ w przeglądarce  | Udowodnić przepływ z US-01/US-02/US-05 bez ręcznego klikania, wraz z nieodwracalnością usunięcia | #2, #7          | e2e                   | not started | —             |
-| 4   | Bramki i higiena dostępu          | Zablokować regresję w CI i domknąć wymaganie o nieujawnianiu istnienia konta                     | #5, przekrojowe | gates, manual smoke   | not started | —             |
+| 3   | Kluczowy przepływ w przeglądarce  | Udowodnić przepływ z US-01/US-02/US-05 bez ręcznego klikania, wraz z nieodwracalnością usunięcia | #2, #7          | e2e                   | not started                                                                                | —             |
+| 4   | Bramki i higiena dostępu          | Zablokować regresję w CI i domknąć wymaganie o nieujawnianiu istnienia konta                     | #5, przekrojowe | gates, manual smoke   | not started                                                                                | —             |
 
 Ryzyko #7 (nieodwracalna utrata zadania) zostało pokryte poza swoją fazą — test „ukończenie nie kasuje wiersza i daje się cofnąć" wszedł razem z Fazą 1, bo korzysta z tej samej infrastruktury dwóch kont. W Fazie 3 zostaje z niego wyłącznie potwierdzenie usunięcia w interfejsie.
 

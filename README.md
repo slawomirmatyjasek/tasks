@@ -93,17 +93,17 @@ npm run dev
 
 ### Dostępne skrypty
 
-| Komenda                 | Działanie                                             |
-| ----------------------- | ----------------------------------------------------- |
-| `npm run dev`           | Serwer deweloperski (środowisko Cloudflare `workerd`) |
-| `npm run build`         | Build produkcyjny                                     |
-| `npm run preview`       | Podgląd buildu produkcyjnego                          |
-| `npm run lint`          | ESLint z regułami opartymi o typy                     |
-| `npm run lint:fix`      | ESLint z automatyczną naprawą                         |
-| `npm run format`        | Prettier                                              |
-| `npm test`              | Testy jednostkowe (jednorazowo)                       |
-| `npm run test:watch`    | Testy w trybie obserwowania                           |
-| `npm run test:coverage` | Testy z raportem pokrycia                             |
+| Komenda                    | Działanie                                              |
+| -------------------------- | ------------------------------------------------------ |
+| `npm run dev`              | Serwer deweloperski (środowisko Cloudflare `workerd`)  |
+| `npm run build`            | Build produkcyjny                                      |
+| `npm run preview`          | Podgląd buildu produkcyjnego                           |
+| `npm run lint`             | ESLint z regułami opartymi o typy                      |
+| `npm run lint:fix`         | ESLint z automatyczną naprawą                          |
+| `npm run format`           | Prettier                                               |
+| `npm test`                 | Testy jednostkowe (jednorazowo)                        |
+| `npm run test:watch`       | Testy w trybie obserwowania                            |
+| `npm run test:coverage`    | Testy z raportem pokrycia                              |
 | `npm run test:integration` | Testy integracyjne wobec prawdziwej bazy (patrz niżej) |
 
 ## Bramki jakości
@@ -138,11 +138,11 @@ W zestawie obowiązują dwie zasady: **każdy test czasowy wstrzykuje własny mo
 
 Pokrywają ryzyka z [`context/foundation/test-plan.md`](context/foundation/test-plan.md), których nie da się sprawdzić bez bazy:
 
-| Ryzyko | Co jest sprawdzane |
-| ------ | ------------------ |
-| #2 | Konto B nie widzi zadania konta A na liście, nie zmieni go, nie usunie i nie wstawi wiersza z cudzym `user_id`. Osobny test potwierdza, że **właściciel przechodzi tą samą ścieżką bez przeszkód** — inaczej odmowy niczego by nie dowodziły |
-| #7 | Ukończenie zadania nie kasuje wiersza, gasi flagę pilności i daje się cofnąć |
-| #3, #6 | Zapisany moment terminu jest po odczycie tym samym momentem, a flaga pilności zgadza się z terminem po obu stronach progu 48 h |
+| Ryzyko | Co jest sprawdzane                                                                                                                                                                                                                           |
+| ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #2     | Konto B nie widzi zadania konta A na liście, nie zmieni go, nie usunie i nie wstawi wiersza z cudzym `user_id`. Osobny test potwierdza, że **właściciel przechodzi tą samą ścieżką bez przeszkód** — inaczej odmowy niczego by nie dowodziły |
+| #7     | Ukończenie zadania nie kasuje wiersza, gasi flagę pilności i daje się cofnąć                                                                                                                                                                 |
+| #3, #6 | Zapisany moment terminu jest po odczycie tym samym momentem, a flaga pilności zgadza się z terminem po obu stronach progu 48 h                                                                                                               |
 
 Wymagają czterech zmiennych środowiskowych z danymi dwóch **różnych** kont (`PILNE_TEST_A_*`, `PILNE_TEST_B_*` — wzór w `.env.example`). Bez nich zestaw jest pomijany, a nie czerwony: brak konfiguracji to nie regresja produktu. Po sobie sprzątają — każde utworzone zadanie jest usuwane w `afterAll`.
 
@@ -168,15 +168,15 @@ Aplikacja jest wieloużytkownikowa, z jedną rolą: właściciel swoich zadań. 
 
 Trasy aplikacji:
 
-| Trasa                 | Opis                                                |
-| --------------------- | --------------------------------------------------- |
-| `/`                   | Wizytówka dla gościa; zalogowany trafia na `/dashboard` |
-| `/auth/signup`        | Rejestracja                                         |
-| `/auth/signin`        | Logowanie                                           |
-| `/auth/confirm-email` | Informacja o potwierdzeniu adresu po rejestracji    |
-| `/dashboard`          | Lista zadań — chroniona, przekierowuje na logowanie |
+| Trasa                 | Opis                                                                  |
+| --------------------- | --------------------------------------------------------------------- |
+| `/`                   | Wizytówka dla gościa; zalogowany trafia na `/dashboard`               |
+| `/auth/signup`        | Rejestracja                                                           |
+| `/auth/signin`        | Logowanie                                                             |
+| `/auth/confirm-email` | Informacja o potwierdzeniu adresu po rejestracji                      |
+| `/dashboard`          | Lista zadań — chroniona, przekierowuje na logowanie                   |
 | `/api/tasks`          | Tworzenie zadania (`POST`); listę pobiera serwerowo `dashboard.astro` |
-| `/api/tasks/[id]`     | Edycja i usunięcie zadania (`PATCH`, `DELETE`)      |
+| `/api/tasks/[id]`     | Edycja i usunięcie zadania (`PATCH`, `DELETE`)                        |
 
 ## Wdrożenie
 
@@ -191,16 +191,17 @@ npx wrangler deploy
 
 ## Dokumentacja projektu
 
-| Dokument                                                                     | Co zawiera                                                                                        |
-| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| [`context/foundation/prd.md`](context/foundation/prd.md)                     | Problem, persona, historyjki US-01–US-05, wymagania FR-001–FR-010, reguła biznesowa, granice MVP  |
-| [`context/foundation/tech-stack.md`](context/foundation/tech-stack.md)       | Wybrany stack i uzasadnienie decyzji                                                              |
-| [`context/foundation/roadmap.md`](context/foundation/roadmap.md)             | Plan wdrożenia podzielony na etapy, stan bazowy i otwarte pytania produktowe                      |
-| [`context/foundation/test-plan.md`](context/foundation/test-plan.md)         | Mapa ryzyk, fazowy plan testów i uczciwy opis tego, czego zestaw testów jeszcze nie dowodzi       |
-| [`context/foundation/decisions-log.md`](context/foundation/decisions-log.md) | Log ustaleń — punkt powrotu po przerwie, wraz z wymogami zaliczenia kursu                         |
-| [`context/foundation/health-check.md`](context/foundation/health-check.md)   | Kontrola stanu projektu po bootstrapie: zależności, runner testów, build                          |
-| [`context/handoff.md`](context/handoff.md)                                   | Pełny stan przekazania: co zrobione, co zweryfikowane na żywo, znane długi i pułapki repozytorium |
-| [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md)                           | Twarde reguły projektu i konwencje dla agentów pracujących nad kodem                              |
+| Dokument                                                                       | Co zawiera                                                                                                                                |
+| ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| [`context/foundation/prd.md`](context/foundation/prd.md)                       | Problem, persona, historyjki US-01–US-05, wymagania FR-001–FR-010, reguła biznesowa, granice MVP                                          |
+| [`context/foundation/tech-stack.md`](context/foundation/tech-stack.md)         | Wybrany stack i uzasadnienie decyzji                                                                                                      |
+| [`context/foundation/roadmap.md`](context/foundation/roadmap.md)               | Plan wdrożenia podzielony na etapy, stan bazowy i otwarte pytania produktowe                                                              |
+| [`context/foundation/infrastructure.md`](context/foundation/infrastructure.md) | Gdzie aplikacja stoi: Worker, projekt Supabase, model dostępu w bazie, sekrety w czterech środowiskach, CI/CD, pułapki i wycofanie zmiany |
+| [`context/foundation/test-plan.md`](context/foundation/test-plan.md)           | Mapa ryzyk, fazowy plan testów i uczciwy opis tego, czego zestaw testów jeszcze nie dowodzi                                               |
+| [`context/foundation/decisions-log.md`](context/foundation/decisions-log.md)   | Log ustaleń — punkt powrotu po przerwie, wraz z wymogami zaliczenia kursu                                                                 |
+| [`context/foundation/health-check.md`](context/foundation/health-check.md)     | Kontrola stanu projektu po bootstrapie: zależności, runner testów, build                                                                  |
+| [`context/handoff.md`](context/handoff.md)                                     | Pełny stan przekazania: co zrobione, co zweryfikowane na żywo, znane długi i pułapki repozytorium                                         |
+| [`AGENTS.md`](AGENTS.md), [`CLAUDE.md`](CLAUDE.md)                             | Twarde reguły projektu i konwencje dla agentów pracujących nad kodem                                                                      |
 
 ## Licencja
 
