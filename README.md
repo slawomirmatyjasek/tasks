@@ -47,7 +47,7 @@ Uzasadnienie wyboru: [`context/foundation/tech-stack.md`](context/foundation/tec
 ### 1. Sklonuj repozytorium
 
 ```bash
-git clone https://github.com/slawomirmatyjasek/tasks.git
+git clone https://github.com/slawomirmatyjasek/pilne.git
 cd tasks
 npm ci
 ```
